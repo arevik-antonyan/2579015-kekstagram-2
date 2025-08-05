@@ -1,16 +1,16 @@
 /* Модуль для вспомогательных функций */
 
 // Получить случайное число из заданного диапазона
-function getRandomInteger(min, max) {
+const getRandomInteger = (min, max) => {
   const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
   const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
   const result = Math.random() * (upper - lower + 1) + lower;
 
   return Math.floor(result);
-}
+};
 
 // Получить уникальное случайное число
-function getUniqueRandomInteger() {
+const getUniqueRandomInteger = () => {
   const previousValues = [];
 
   return function () {
@@ -22,16 +22,16 @@ function getUniqueRandomInteger() {
     previousValues.push(currentValue);
     return currentValue;
   };
-}
+};
 
 // Получить случайный элемент массива
-function getRandomItem(array) {
+const getRandomItem = (array) => {
   const randomIndex = getRandomInteger(0, array.length - 1);
   return array[randomIndex];
-}
+};
 
 // Получить перемешанный массив (алгоритм Фишера-Йетса)
-function shuffleArray(arr) {
+const shuffleArray = (arr) => {
   const array = arr.slice();
 
   for (let i = array.length - 1; i > 0; i--) {
@@ -40,10 +40,10 @@ function shuffleArray(arr) {
   }
 
   return array;
-}
+};
 
 // Получить одно или два случайных элемента из массива
-function getRandomOneOrTwo(arr) {
+const getRandomOneOrTwo = (arr) => {
   const count = getRandomInteger(1, 2);
   const mixedArr = shuffleArray(arr);
 
@@ -51,12 +51,12 @@ function getRandomOneOrTwo(arr) {
     return mixedArr[0];
   }
   return mixedArr[0] + mixedArr[1];
-}
+};
 
 // Проверить есть ли дубликаты
-function hasDuplicates(arr) {
+const hasDuplicates = (arr) => {
   const uniqueItems = new Set(arr);
   return uniqueItems.size !== arr.length;
-}
+};
 
 export {getRandomInteger, getUniqueRandomInteger, getRandomItem, shuffleArray, getRandomOneOrTwo, hasDuplicates};
