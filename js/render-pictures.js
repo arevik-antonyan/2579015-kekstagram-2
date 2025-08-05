@@ -1,4 +1,4 @@
-import {onClickPictureHandler} from './render-big-picture.js';
+import {onPictureClick} from './render-big-picture.js';
 
 // Создание элемента Picture
 const createPicture = (id, post, pictureTemplate) => {
@@ -32,7 +32,7 @@ const renderPosts = (posts) => {
 
     if (picture) {
       evt.preventDefault();
-      onClickPictureHandler(posts[picture.dataset.id]);
+      onPictureClick(posts[picture.dataset.id]);
     }
   });
 };

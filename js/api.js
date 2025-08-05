@@ -1,5 +1,3 @@
-import {showMessage} from './dom-utils.js';
-
 const SERVER_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
 
 const Route = {
@@ -7,11 +5,19 @@ const Route = {
   SEND_DATA: '/',
 };
 
+const ErrorText = {
+  GET_DATA: 'Не удалось загрузить данные. Попробуйте обновить страницу',
+  SEND_DATA: 'Не удалось отправить форму. Попробуйте ещё раз',
+};
+
 // Получить данные с сервера
 export const getData = () => fetch(
   SERVER_URL + Route.GET_DATA)
   .then((response) => response.json())
-  .catch(() => showMessage('data-error'));
+  .catch(() => {
+    throw new Error(ErrorText.GET_DATA);
+  }
+  );
 
 // Отправить данные на сервер
 export const sendData = (formData) => fetch(
@@ -24,9 +30,7 @@ export const sendData = (formData) => fetch(
   if (!response.ok) {
     throw new Error();
   }
-  showMessage('success');
 })
   .catch(() => {
-    showMessage('error');
-    throw new Error();
+    throw new Error(ErrorText.SEND_DATA);
   });

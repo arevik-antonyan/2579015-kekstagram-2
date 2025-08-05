@@ -1,7 +1,7 @@
 import {sendData} from './api.js';
 import {hasDuplicates} from './utils.js';
-import {onKeydownEscHandler, openModal, closeModal, addEventListeners, removeEventListeners} from './dom-utils.js';
-import {addSliderEffects, removeSliderEffects} from './effects.js';
+import {onKeydownEsc, openModal, closeModal, addEventListeners, removeEventListeners, showMessage, isAddedEventKeydown, resetForm} from './dom-utils.js';
+import {addSliderEffects, removeSliderEffects, addScaleEditing, removeScaleEditing, changeImage} from './effects.js';
 
 const form = document.querySelector('.img-upload__form');
 const overlay = document.querySelector('.img-upload__overlay');
@@ -12,6 +12,7 @@ const inputHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
 
 const DESCRIPTION_REGEXP = /^.{0,140}$/;
+const FILE_TYPES = ['.jpg', '.jpeg', '.png'];
 const LIMIT_COUNT_HASHTAG = 5;
 let errorMessage = '';
 
@@ -41,9 +42,9 @@ const rules = [
 
 const handlers = [
   { event: 'click', element: buttonClose, handler: closeForm},
-  { event: 'keydown', element: document, handler: onKeydownEscFormHandler },
-  { event: 'keydown', element: inputHashtags, handler: onKeydownEscFieldHandler },
-  { event: 'keydown', element: description, handler: onKeydownEscFieldHandler }
+  { event: 'keydown', element: document, handler: onFormKeydownEsc },
+  { event: 'keydown', element: inputHashtags, handler: onFieldKeydownEsc },
+  { event: 'keydown', element: description, handler: onFieldKeydownEsc }
 ];
 
 const pristine = new Pristine(form, {
@@ -54,19 +55,26 @@ const pristine = new Pristine(form, {
 
 const getErrorMessage = () => errorMessage;
 
-function onKeydownEscFormHandler(evt) {
-  onKeydownEscHandler(evt, closeForm);
+// Обработчик нажатия Esc у формы
+function onFormKeydownEsc(evt) {
+  const addedEventKeydown = isAddedEventKeydown();
+
+  if (!addedEventKeydown) {
+    onKeydownEsc(evt, closeForm);
+  }
 }
 
-function onKeydownEscFieldHandler(evt) {
-  onKeydownEscHandler(evt, () => evt.stopPropagation());
+// Обработчик нажатия Esc у полей ввода
+function onFieldKeydownEsc(evt) {
+  onKeydownEsc(evt, () => evt.stopPropagation());
 }
 
 // Закрытие формы
 function closeForm () {
   closeModal(overlay);
   removeEventListeners(handlers);
-  form.reset();
+  resetForm(form, pristine);
+  removeScaleEditing();
   removeSliderEffects();
 }
 
@@ -74,6 +82,7 @@ function closeForm () {
 const openForm = () => {
   openModal(overlay);
   addEventListeners(handlers);
+  addScaleEditing();
   addSliderEffects();
 };
 
@@ -117,11 +126,7 @@ const checkHashtags = () => {
   return true;
 };
 
-inputFile.addEventListener('change', openForm);
-
-pristine.addValidator(inputHashtags, checkHashtags, getErrorMessage);
-pristine.addValidator(description, () => DESCRIPTION_REGEXP.test(description.value), 'Длина комментария не может составлять больше 140 символов.');
-
+// Отправка формы
 const setUserFormSubmit = (onSuccess) => {
   form.addEventListener('submit', (evt) => {
     evt.preventDefault();
@@ -130,10 +135,29 @@ const setUserFormSubmit = (onSuccess) => {
       blockButtonSubmit();
       const formData = new FormData(evt.target);
       sendData(formData)
+        .then(() => showMessage('success'))
         .then(onSuccess)
+        .catch(() => showMessage('error'))
         .finally(unblockButtonSubmit);
     }
   });
 };
+
+inputFile.addEventListener('change', () => {
+  const file = inputFile.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const isValidType = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (isValidType) {
+    changeImage(URL.createObjectURL(file));
+    openForm();
+  } else {
+    showMessage('data-error', 'Недопустимый тип файла');
+  }
+});
+
+pristine.addValidator(inputHashtags, checkHashtags, getErrorMessage);
+pristine.addValidator(description, () => DESCRIPTION_REGEXP.test(description.value), 'Длина комментария не может составлять больше 140 символов.');
 
 setUserFormSubmit(closeForm);

@@ -1,4 +1,4 @@
-import {makeElement, openModal, closeModal, onKeydownEscHandler, addEventListeners, removeEventListeners} from './dom-utils.js';
+import {makeElement, openModal, closeModal, onKeydownEsc, addEventListeners, removeEventListeners} from './dom-utils.js';
 
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImage = bigPicture.querySelector('.big-picture__img img');
@@ -10,8 +10,8 @@ const COUNT_ITERATION = 5;
 let currentCount = 0;
 
 const handlers = [
-  { event: 'keydown', element: document, handler: onKeydownEscBigPictureHandler },
-  { event: 'click', element: buttonClose, handler: onClickCloseButtonHandler },
+  { event: 'keydown', element: document, handler: onBigPictureKeydownEsc },
+  { event: 'click', element: buttonClose, handler: onCloseButtonClick },
   { event: 'click', element: buttonDownload, handler: showNextComments}
 ];
 
@@ -51,13 +51,15 @@ const initComments = (comments) => {
 
 // Обновить количество показанных комментариев
 const updateCounterComments = () => {
-  const shownComments = getComments().filter((comment) => !comment.classList.contains('hidden'));
+  const comments = getComments();
+  const shownComments = comments.filter((comment) => !comment.classList.contains('hidden'));
   commentShownCount.textContent = shownComments.length;
 };
 
 // Показать комментарии
 function showNextComments() {
-  const slicedComments = getComments().slice(currentCount, currentCount + COUNT_ITERATION);
+  const comments = getComments();
+  const slicedComments = comments.slice(currentCount, currentCount + COUNT_ITERATION);
 
   slicedComments.forEach((element) => {
     element.classList.remove('hidden');
@@ -66,7 +68,7 @@ function showNextComments() {
   currentCount += COUNT_ITERATION;
   updateCounterComments();
 
-  if (currentCount >= getComments().length) {
+  if (currentCount >= comments.length) {
     buttonDownload.classList.add('hidden');
   }
 }
@@ -86,18 +88,18 @@ const сloseBigPicture = () => {
 };
 
 // Обработчик события нажатия Escape
-function onKeydownEscBigPictureHandler (evt) {
-  onKeydownEscHandler(evt, сloseBigPicture);
+function onBigPictureKeydownEsc (evt) {
+  onKeydownEsc(evt, сloseBigPicture);
 }
 
 // Обработчик события нажатия на кнопку закрыть
-function onClickCloseButtonHandler(evt) {
+function onCloseButtonClick(evt) {
   evt.preventDefault();
   сloseBigPicture();
 }
 
 // Обработчик нажатия на миниатюру
-const onClickPictureHandler = (post) => {
+const onPictureClick = (post) => {
   openBigPicture();
 
   bigPictureImage.src = post.url;
@@ -109,4 +111,4 @@ const onClickPictureHandler = (post) => {
   showNextComments();
 };
 
-export {onClickPictureHandler};
+export {onPictureClick};

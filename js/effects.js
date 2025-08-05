@@ -1,9 +1,10 @@
-import {addEventListeners, removeEventListeners, createSlider, updateOptionsSlider} from './dom-utils.js';
+import {findInArray, addEventListeners, removeEventListeners, createSlider, updateOptionsSlider} from './dom-utils.js';
 
 const buttonSmaller = document.querySelector('.scale__control--smaller');
 const buttonBigger = document.querySelector('.scale__control--bigger');
 const inputScale = document.querySelector('.scale__control--value');
 const imagePreview = document.querySelector('.img-upload__preview img');
+const effectsPreview = document.querySelectorAll('.effects__preview');
 const sliderContainer = document.querySelector('.img-upload__effect-level');
 const slider = document.querySelector('.effect-level__slider');
 const inputEffectLevel = document.querySelector('.effect-level__value');
@@ -13,8 +14,8 @@ const MAX_VALUE_SCALE = 100;
 const MIN_VALUE_SCALE = 25;
 
 const clickHandlers = [
-  { event: 'click', element: buttonSmaller, handler: () => addInputScale(-STEP_SCALE)},
-  { event: 'click', element: buttonBigger, handler: () => addInputScale(STEP_SCALE) }
+  { event: 'click', element: buttonSmaller, handler: () => addScale(-STEP_SCALE)},
+  { event: 'click', element: buttonBigger, handler: () => addScale(STEP_SCALE) }
 ];
 
 const effects = {
@@ -36,7 +37,7 @@ const effectsConfig = {
 };
 
 // Добавить к масштабу заданное значение
-function addInputScale(step) {
+function addScale(step) {
   const currentScale = Number(inputScale.value.replace('%', ''));
   const newScale = currentScale + step;
 
@@ -46,67 +47,82 @@ function addInputScale(step) {
   }
 }
 
-// Скрыть слайдер и отключить эффекты
-function resetEffects() {
+// Спрятать слайдер
+const hiddenSlider = () => {
   sliderContainer.classList.add('hidden');
+  slider.classList.add('hidden');
+};
 
-  effectsList.forEach((effect) => {
-    effect.disabled = true;
-  });
-}
-
-// Получить выбранный эффект
-function getCheckedEffect() {
-  return Array.from(effectsList).find((radio) => radio.checked);
-}
+// Показать слайдер
+const showSlider = () => {
+  sliderContainer.classList.remove('hidden');
+  slider.classList.remove('hidden');
+};
 
 // Обработчик изменения слайдера
-function onUpdateSliderHandler() {
+const onSliderUpdate = () => {
   inputEffectLevel.value = slider.noUiSlider.get();
-  const checkedEffect = getCheckedEffect().value;
+  const checkedEffect = findInArray(effectsList, (radio) => radio.checked).value;
   const effectFunc = effects[checkedEffect];
   imagePreview.style.filter = effectFunc(inputEffectLevel.value);
-}
+};
 
-// Обработчик эффекта
-function onChangeEffectHandler(evt) {
+// Обработчик изменения эффекта
+const onEffectChange = (evt) => {
   const effect = evt.target.value;
   const config = effectsConfig[effect];
 
-  if (effect === 'none') {
-    resetEffects();
-  }
+  const func = effect === 'none' ? hiddenSlider : showSlider;
+  func();
 
   updateOptionsSlider(slider, config.min, config.max, config.step);
-}
+};
+
+// Добавить редактирование масштаба
+const addScaleEditing = () => {
+  addEventListeners(clickHandlers);
+};
+
+// Удалить редактирование масштаба
+const removeScaleEditing = () => {
+  removeEventListeners(clickHandlers);
+};
 
 // Добавить слайдер эффектов
-function addSliderEffects() {
-  // Создаем слайдер
+const addSliderEffects = () => {
   createSlider(slider, 0, 1, 0.1);
-  // Добавить обработчики для кнопок scale
-  addEventListeners(clickHandlers);
-  // Добавить обработчик изменения слайдера
-  slider.noUiSlider.on('update', onUpdateSliderHandler);
-  // Добавить обработчики эффектов
+  sliderContainer.classList.add('hidden');
+  slider.noUiSlider.on('update', onSliderUpdate);
+
   effectsList.forEach((radio) => {
-    radio.addEventListener('change', onChangeEffectHandler);
+    radio.addEventListener('change', onEffectChange);
   });
-}
+};
+
+// Очистить стили у картинки
+const clearStyleImage = () => {
+  imagePreview.style.filter = 'none';
+  imagePreview.style.transform = 'none';
+};
 
 // Удалить слайдер эффектов
-function removeSliderEffects() {
-  // Удалить обработчики для кнопок scale
-  removeEventListeners(clickHandlers);
-  // Удалить обработчики эффектов
+const removeSliderEffects = () => {
   effectsList.forEach((radio) => {
-    radio.removeEventListener('change', onChangeEffectHandler);
+    radio.removeEventListener('change', onEffectChange);
   });
 
   slider.noUiSlider.destroy();
-  imagePreview.style.filter = 'none';
-  imagePreview.style.transform = 'none';
-}
+  clearStyleImage();
+};
 
-export {addSliderEffects, removeSliderEffects};
+// Сменить картинку
+const changeImage = (newUrl) => {
+  imagePreview.src = newUrl;
+
+  effectsPreview.forEach((effect) => {
+    effect.style.backgroundImage = `url(${newUrl})`;
+  });
+};
+
+export {addSliderEffects, removeSliderEffects, addScaleEditing, removeScaleEditing, changeImage};
 
