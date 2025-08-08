@@ -1,11 +1,12 @@
 import {findInArray, debounce} from './dom-utils.js';
 
+const RERENDER_DELAY = 500;
+const COUNT_SHOWN_PICTURES = 10;
+const ACTIVE_BUTTON_CLASS = 'img-filters__button--active';
+
 const filters = document.querySelector('.img-filters');
 const pictures = document.querySelector('.pictures');
 const buttonFilters = document.querySelectorAll('.img-filters__button');
-const ACTIVE_BUTTON_CLASS = 'img-filters__button--active';
-const COUNT_SHOWN_PICTURES = 10;
-const RERENDER_DELAY = 500;
 let picturesArray = [];
 
 const COMPARE_FUNC = {

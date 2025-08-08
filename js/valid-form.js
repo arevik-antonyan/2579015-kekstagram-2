@@ -3,6 +3,13 @@ import {hasDuplicates} from './utils.js';
 import {onKeydownEsc, openModal, closeModal, addEventListeners, removeEventListeners, showMessage, isAddedEventKeydown, resetForm} from './dom-utils.js';
 import {addSliderEffects, removeSliderEffects, addScaleEditing, removeScaleEditing, changeImage} from './effects.js';
 
+const LIMIT_COUNT_HASHTAG = 5;
+const DESCRIPTION_REGEXP = /^.{0,140}$/;
+const FILE_TYPES = ['.jpg', '.jpeg', '.png'];
+const buttonSubmitText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Опубликовываю...' };
+
 const form = document.querySelector('.img-upload__form');
 const overlay = document.querySelector('.img-upload__overlay');
 const inputFile = document.querySelector('.img-upload__input');
@@ -10,16 +17,7 @@ const buttonClose = document.querySelector('.img-upload__cancel');
 const buttonSubmit = document.querySelector('.img-upload__submit');
 const inputHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
-
-const DESCRIPTION_REGEXP = /^.{0,140}$/;
-const FILE_TYPES = ['.jpg', '.jpeg', '.png'];
-const LIMIT_COUNT_HASHTAG = 5;
 let errorMessage = '';
-
-const buttonSubmitText = {
-  IDLE: 'Опубликовать',
-  SENDING: 'Опубликовываю...'
-};
 
 const rules = [
   {

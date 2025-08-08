@@ -1,12 +1,13 @@
 import {makeElement, openModal, closeModal, onKeydownEsc, addEventListeners, removeEventListeners} from './dom-utils.js';
 
+const COUNT_ITERATION = 5;
+
 const bigPicture = document.querySelector('.big-picture');
 const bigPictureImage = bigPicture.querySelector('.big-picture__img img');
 const commentShownCount = bigPicture.querySelector('.social__comment-shown-count');
 const commentsContainer = bigPicture.querySelector('.social__comments');
 const buttonClose = bigPicture.querySelector('.big-picture__cancel');
 const buttonDownload = bigPicture.querySelector('.comments-loader');
-const COUNT_ITERATION = 5;
 let currentCount = 0;
 
 const handlers = [

@@ -1,5 +1,9 @@
 import {findInArray, addEventListeners, removeEventListeners, createSlider, updateOptionsSlider} from './dom-utils.js';
 
+const STEP_SCALE = 25;
+const MAX_VALUE_SCALE = 100;
+const MIN_VALUE_SCALE = 25;
+
 const buttonSmaller = document.querySelector('.scale__control--smaller');
 const buttonBigger = document.querySelector('.scale__control--bigger');
 const inputScale = document.querySelector('.scale__control--value');
@@ -9,9 +13,6 @@ const sliderContainer = document.querySelector('.img-upload__effect-level');
 const slider = document.querySelector('.effect-level__slider');
 const inputEffectLevel = document.querySelector('.effect-level__value');
 const effectsList = document.querySelectorAll('input[name="effect"]');
-const STEP_SCALE = 25;
-const MAX_VALUE_SCALE = 100;
-const MIN_VALUE_SCALE = 25;
 
 const clickHandlers = [
   { event: 'click', element: buttonSmaller, handler: () => addScale(-STEP_SCALE)},

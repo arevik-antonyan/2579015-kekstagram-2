@@ -17,7 +17,7 @@ export const makeElement = (tagName, className, text) => {
 };
 
 // Найти в массиве
-export const findInArray = (array, predicate) => Array.from(array).find(predicate);
+export const findInArray = (elements, predicate) => Array.from(elements).find(predicate);
 
 // Обработчик события нажатия Escape
 export const onKeydownEsc = (evt, callback) => {
